@@ -3,7 +3,7 @@ from datasetImages import DatasetImages
 from datasetPSF import DatasetPSF
 from datasetDirty import DatasetDirty
 from paramsEllipses import ParamsEllipses
-import numpy as cp
+import cupy as cp
 
 class Simulator:
     def psf_gauss(self,tamX,tamY):
@@ -16,42 +16,36 @@ class Simulator:
     def psf_real(self,size):
         type_psf = 'psf_real_'+str(size)+'x'+str(size)
         url = 'https://github.com/nicolasalarconl/InterferometryDeepLearning/blob/main/4_hd142_128x128_08.psf.fits?raw=true'
-        psf = DatasetPSF(size).read_url(size,type_psf,url)
-        return DatasetPSF(size).resize(psf,size)
+        psf = DatasetPSF(size,type_psf).read_url(size,type_psf,url)
+        return DatasetPSF(size,type_psf).resize(psf,size)
         
     
     def create_all(self,size,start,finish,step):
     
         list_index = cp.arange(int(start),int(finish),int(step))
-        for index in list_index[0:len(list_index)-2]:
-            params = ParamsEllipses(size)
+        for index in list_index:    
+            params = ParamsEllipses(size,index)
             dataset = DatasetImages(size)
-            dataset.save(size_image =params.size_figure, params = params,start = index,finish =index+step-1)
-        type_psf = 'psf_gauss_'+str(params.size_figure)+'x'+str(params.size_figure)
-        psf_gauss = self.psf_gauss(params.size_figure,params.size_figure)
-        psf = DatasetPSF(size)
-        psf.save(size_image=params.size_figure,type_psf=type_psf,psf= psf_gauss)
-        psf_gauss = psf.image
+            dataset.save(size_image =params.size_figure, params = params,start = index,finish =index+step)
+
+            type_psf = 'psf_gauss_'+str(params.size_figure)+'x'+str(params.size_figure)
+            psf_gauss = self.psf_gauss(params.size_figure,params.size_figure)
+            psf = DatasetPSF(size,type_psf)
+            psf.save(size_image=params.size_figure,type_psf=type_psf,psf= psf_gauss)
+            psf_gauss = psf.image
         
-        list_index = cp.arange(start,finish,step)
-        for index in list_index:
-            if (index != list_index[len(list_index)-1]):
-                dataset = DatasetImages(size)
-                images = dataset.read(params.size_figure,start = index,finish =index+step)
-                dirty_gauss = DatasetDirty(size)
-                dirty_gauss.save(images,params.size_figure,type_psf,psf_gauss,start = index ,finish = index+step-1)
-        type_psf = 'psf_real_'+str(params.size_figure)+'x'+str(params.size_figure)
-        psf_real = self.psf_real(params.size_figure)
-        psf = DatasetPSF(size)
-        psf.save(size_image=params.size_figure,type_psf=type_psf,psf= psf_real)
-        psf_real = psf.image 
-        list_index = cp.arange(start,finish,step)
-        for index in list_index:
-            if (index != list_index[len(list_index)-1]):
-                dataset = DatasetImages(size)
-                images = dataset.read(params.size_figure,start = index,finish =index+step)
-                dirty_gauss = DatasetDirty(size)
-                dirty_gauss.save(images,params.size_figure,type_psf,psf_gauss,start = index ,finish = index+step-1)
+            images = dataset.read(params.size_figure,start = index,finish =index+step)
+            dirty_gauss = DatasetDirty(size,type_psf)
+            dirty_gauss.save(images,params.size_figure,type_psf,psf_gauss,start = index ,finish = index+step)
+        
+            type_psf = 'psf_real_'+str(params.size_figure)+'x'+str(params.size_figure)
+            psf_real = self.psf_real(params.size_figure)
+            psf = DatasetPSF(size,type_psf)
+            psf.save(size_image=params.size_figure,type_psf=type_psf,psf= psf_real)
+            psf_real = psf.image 
+         
+            dirty_gauss = DatasetDirty(size,type_psf)
+            dirty_gauss.save(images,params.size_figure,type_psf,psf_gauss,start = index ,finish = index+step)
 
         
 

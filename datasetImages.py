@@ -4,7 +4,7 @@ from auxiliaryFunctions import AuxiliaryFunctions
 from listEllipses import ListEllipses
 from randomImage import RandomImage
 from astropy.io import fits
-import numpy as cp
+import cupy as cp
 import numpy as np
 import time
 
@@ -48,15 +48,15 @@ class DatasetImages:
             self.path_save = path
         AuxiliaryFunctions.make_dir(self.path_save)
         size = size_image
-        list_figure_random = ListEllipses(params)
+        list_figure_random = ListEllipses(params,start)
         self.recursions = []
         self.times = []
         for index in cp.arange(int(start),int(finish),1):
             start_time = time.time()
-            image = RandomImage(list_figure_random)
-            self.recursions.append(image.recursion)
-            hdu_image =fits.PrimaryHDU(cp.asnumpy(image.image))
-            hdu_image.writeto(self.path_save+'/image_'+str(self.size_image)+'x'+str(self.size_image)+'_'+str(index)+'.fits',clobber=True)
+            image = RandomImage(list_figure_random,start)
+            #self.recursions.append(image.recursion)
+            #hdu_image =fits.PrimaryHDU(cp.asnumpy(image.image))
+            #hdu_image.writeto(self.path_save+'/image_'+str(self.size_image)+'x'+str(self.size_image)+'_'+str(index)+'.fits',clobber=True)
             stop_time = time.time()
             self.times.append(stop_time-start_time)        
         

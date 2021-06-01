@@ -4,7 +4,7 @@ from auxiliaryFunctions import AuxiliaryFunctions
 from datasetImages import DatasetImages
 from datasetPSF import DatasetPSF
 from astropy.io import fits
-import numpy as cp
+import cupy as cp
 import numpy as np
 import time
 from cupyx.scipy import ndimage #as ndcupy
@@ -12,9 +12,9 @@ from cupyx.scipy import ndimage #as ndcupy
 
 # %%
 class DatasetDirty:
-    def __init__(self,size_image,path_save = None,path_read = None): 
+    def __init__(self,size_image,type_psf,path_save = None,path_read = None): 
         self.size_image = size_image
-        self.type_psf = ''
+        self.type_psf = type_psf
         self.psf = []
         self.path_save = self.init_path_save(path_save)
         self.path_read = self.init_path_read(path_read)
@@ -39,6 +39,9 @@ class DatasetDirty:
         return len(self.dirtys)
     
     def save(self,images,size_image,type_psf,psf,start,finish ,path = None):
+            
+        print('start'+str(start))
+        print('finish'+str(finish))
         self.size_image = size_image
         self.type_psf = type_psf
         self.psf = psf 
@@ -48,12 +51,13 @@ class DatasetDirty:
         dirtys = []
         index = start
         self.times = []
-        for image in images[int(start):int(finish)]:
+        for image in images:
             start_time = time.time()
             image = cp.array(image)
             psf = cp.array(psf)
             conv = ndimage.convolve(image,psf,mode='constant', cval=0.0)
             hdu_image =fits.PrimaryHDU(cp.asnumpy(conv))
+            print('index'+str(index))
             hdu_image.writeto(self.path_save+'/conv_'+str(self.size_image)+'x'+str(self.size_image)+'_'+str(index)+'.fits',clobber=True)
             index = index + 1
             stop_time = time.time()

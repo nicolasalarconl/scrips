@@ -1,8 +1,7 @@
 # %%
 # %%
-import numpy as cp 
+import cupy as cp 
 import random 
-
 class ParamsEllipses:
     def __init__(self
                 ,size_figure
@@ -17,7 +16,7 @@ class ParamsEllipses:
                 ,step_angle = 0.1
                 ,min_sigma = 0
                 ,max_sigma = 1 
-                ,step_sigma =0.1
+                ,step_sigma =0.15
                 ,size_sample =  20
                 ,n_operation = 10
                 ,percentage_info = 0.01
@@ -97,7 +96,6 @@ class ParamsEllipses:
         else:
             return self.size_figure*mov_y  
         
-  
     def create_list_params(self):
         axis_minor_list = cp.arange(self.min_value_axis_minor,self.max_value_axis_minor,self.step_axis_minor)
         axis_major_list = cp.arange(self.min_value_axis_major,self.max_value_axis_major,self.step_axis_major)
@@ -107,8 +105,9 @@ class ParamsEllipses:
         sigma_list = cp.arange(self.min_sigma,self.max_sigma,self.step_sigma)
         return axis_minor_list,axis_major_list,mov_x_list,mov_y_list,angle_list,sigma_list
     
-    def get_params_random(self):
+    def get_params_random(self,index_random):
         axis_minor_list,axis_major_list,mov_x_list,mov_y_list,angle_list,sigma_list = self.list_params_random
+        random.seed(cp.asnumpy(index_random).item(0))
         axis_minor  = random.choice(axis_minor_list)
         axis_major  = random.choice(axis_major_list)
         mov_x = random.choice(mov_x_list)
@@ -116,8 +115,5 @@ class ParamsEllipses:
         angle = random.choice(angle_list) 
         sigma = random.choice(sigma_list)
         return self.size_figure,axis_minor,axis_major,self.min_value_intensity, self.max_value_intensity,mov_x,moy_y,angle,sigma
-
-# %%
-#params_1= ParamsEllipses(120)
 
 # %%

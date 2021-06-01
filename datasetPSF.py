@@ -1,6 +1,6 @@
 # %%
-import numpy as cp 
-import numpy as np
+import cupy as cp 
+
 from astropy.io import fits
 from astropy.utils.data import download_file
 from matplotlib import pyplot as plt
@@ -9,9 +9,9 @@ from auxiliaryFunctions import AuxiliaryFunctions
 
 # %%
 class DatasetPSF:
-    def __init__(self,size_image,path_save = None,path_read = None):
+    def __init__(self,size_image,type_psf,path_save = None,path_read = None):
         self.size_image = size_image
-        self.type_psf = []
+        self.type_psf = type_psf
         self.image = []
         self.path_save = self.init_path_save(path_save)
         self.path_read = self.init_path_read(path_read)
