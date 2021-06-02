@@ -4,8 +4,8 @@ from auxiliaryFunctions import AuxiliaryFunctions
 from listEllipses import ListEllipses
 from randomImage import RandomImage
 from astropy.io import fits
-#import cupy as cp
-import numpy as cp
+import cupy as cp
+#import numpy as cp
 import numpy as np
 import time
 
@@ -63,8 +63,8 @@ class DatasetImages:
             start_time = time.time()
             image = RandomImage(list_figure_random,index)
             self.recursions.append(image.recursion)
-            #hdu_image =fits.PrimaryHDU(cp.asnumpy(image.image))
-            hdu_image = fits.PrimaryHDU(image.image)
+            hdu_image =fits.PrimaryHDU(cp.asnumpy(image.image))
+            #hdu_image = fits.PrimaryHDU(image.image)
             hdu_image.writeto(self.path_save+'/image_'+str(self.size_image)+'x'+str(self.size_image)+'_'+str(index)+'.fits',overwrite=True)
             stop_time = time.time()
             self.times.append(stop_time-start_time)        
@@ -99,8 +99,8 @@ class DatasetImages:
         if (self.len_images() <= index):
             print("index out of bounds, index max: "+str(self.len_images()-1))
         else:
-            #plt.imshow(cp.asnumpy(self.images[index]))
-            plt.imshow(self.images[index])
+            plt.imshow(cp.asnumpy(self.images[index]))
+            #plt.imshow(self.images[index])
 
 
 # %%

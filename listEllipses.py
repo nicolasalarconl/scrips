@@ -1,7 +1,7 @@
 # %%
 from ellipse import Ellipse
-#import cupy as cp
-import numpy as cp
+import cupy as cp
+#import numpy as cp
 
 # %%
 class ListEllipses:

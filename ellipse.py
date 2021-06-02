@@ -1,7 +1,7 @@
 # %%
 from paramsEllipses import ParamsEllipses
-#import cupy as cp
-import numpy as cp
+import cupy as cp
+#import numpy as cp
 from matplotlib import pyplot as plt
 
 # %%
@@ -39,8 +39,8 @@ class Ellipse:
         return Z
     
     def view(self):
-        #plt.imshow(cp.asnumpy(self.data))
-        plt.imshow(self.data)
+        plt.imshow(cp.asnumpy(self.data))
+        #plt.imshow(self.data)
 
 # %%
 #from paramsEllipses import ParamsEllipses 

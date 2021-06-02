@@ -4,12 +4,12 @@ from auxiliaryFunctions import AuxiliaryFunctions
 from datasetImages import DatasetImages
 from datasetPSF import DatasetPSF
 from astropy.io import fits
-#import cupy as cp
-import  numpy as cp
+import cupy as cp
+#import  numpy as cp
 import numpy as np
 import time
-#from cupyx.scipy import ndimage #as ndcupy
-from scipy import ndimage
+from cupyx.scipy import ndimage #as ndcupy
+#from scipy import ndimage
 
 
 # %%
@@ -55,8 +55,8 @@ class DatasetDirty:
             image = cp.array(image)
             psf = cp.array(psf)
             conv = ndimage.convolve(image,psf,mode='constant', cval=0.0)
-            #hdu_image =fits.PrimaryHDU(cp.asnumpy(conv))
-            hdu_image =fits.PrimaryHDU(conv)
+            hdu_image =fits.PrimaryHDU(cp.asnumpy(conv))
+            #hdu_image =fits.PrimaryHDU(conv)
             hdu_image.writeto(self.path_save+'/conv_'+str(self.size_image)+'x'+str(self.size_image)+'_'+str(index)+'.fits',clobber=True)
             index = index + 1
             stop_time = time.time()
@@ -92,6 +92,6 @@ class DatasetDirty:
         if (self.len_dirtys() <= index):
             print("index out of bounds, index max: "+str(self.len_dirtys()-1))
         else:
-            #plt.imshow(cp.asnumpy(self.dirtys[index]))
-            plt.imshow(self.dirtys[index])
+            plt.imshow(cp.asnumpy(self.dirtys[index]))
+            #plt.imshow(self.dirtys[index])
             

@@ -1,7 +1,7 @@
 # %%
 import random
-#import cupy as cp
-import numpy as cp
+import cupy as cp
+#import numpy as cp
 from matplotlib import pyplot as plt
 
 # %%
@@ -9,8 +9,8 @@ class RandomImage:
     def __init__(self,list_figures,index_random):
         self.recursion = 0
         self.list_figures = list_figures
-        #self.index_random = cp.asnumpy(index_random).item(0)
-        self.index_random = index_random
+        self.index_random = cp.asnumpy(index_random).item(0)
+        #self.index_random = index_random
         
         self.percentage_info = list_figures.params.percentage_info
         self.image = self.random_figure()

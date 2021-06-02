@@ -1,7 +1,6 @@
 # %%
-# %%
-#import cupy as cp 
-import numpy as cp
+import cupy as cp 
+#import numpy as cp
 import random 
 class ParamsEllipses:
     def __init__(self
@@ -108,8 +107,8 @@ class ParamsEllipses:
     
     def get_params_random(self,index_random):
         axis_minor_list,axis_major_list,mov_x_list,mov_y_list,angle_list,sigma_list = self.list_params_random
-        #random.seed(cp.asnumpy(index_random).item(0))
-        random.seed(index_random)
+        random.seed(cp.asnumpy(index_random).item(0))
+        #random.seed(index_random)
         axis_minor  = random.choice(axis_minor_list)
         axis_major  = random.choice(axis_major_list)
         mov_x = random.choice(mov_x_list)

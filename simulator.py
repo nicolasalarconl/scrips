@@ -3,8 +3,8 @@ from datasetImages import DatasetImages
 from datasetPSF import DatasetPSF
 from datasetDirty import DatasetDirty
 from paramsEllipses import ParamsEllipses
-#import cupy as cp
-import numpy as cp
+import cupy as cp
+#import numpy as cp
 
 class Simulator:
     def psf_gauss(self,tamX,tamY):
@@ -24,9 +24,9 @@ class Simulator:
     def create_all(self,size,start,finish,step):
         list_index = cp.arange(int(start),int(finish),int(step))
         for index in list_index:    
-            params = ParamsEllipses(size,index)
+            params = ParamsEllipses(size)
             dataset = DatasetImages(size)
-            dataset.save(size_image =params.size_figure, params = params,start = index,finish =index+step)
+            dataset.save(size_image =params.size_figure, params = params,start = index,stop =index+step)
             
             type_psf = 'psf_gauss_'+str(params.size_figure)+'x'+str(params.size_figure)
             psf_gauss = self.psf_gauss(params.size_figure,params.size_figure)
@@ -34,7 +34,7 @@ class Simulator:
             psf.save(size_image=params.size_figure,type_psf=type_psf,psf= psf_gauss)
             psf_gauss = psf.image
         
-            images = dataset.read(params.size_figure,start = index,finish =index+step)
+            images = dataset.read(params.size_figure,start = index,stop =index+step)
             dirty_gauss = DatasetDirty(size,type_psf)
             dirty_gauss.save(images,params.size_figure,type_psf,psf_gauss,start = index ,finish = index+step)
         
@@ -53,9 +53,57 @@ class Simulator:
         
 
 # %%
-#x = Simulator().create_all(28,0,1000,10)
-#images = DatasetImages(500)
-#images.read(size_image=500, start = 0,finish = 10)
-#images.view()
+#N = 120
+#x = Simulator().create_all(N,0,10,2)
+
+# %%
+''''images = DatasetImages(N)
+_ = images.read(size_image=N, start = 0,stop = 4)
+
+type_psf_gauss = 'psf_gauss_'+str(N)+'x'+str(N)
+psf_gauss = DatasetPSF(N,type_psf_gauss)
+_ =psf_gauss.read(N,type_psf_gauss)
+
+
+type_psf_real = 'psf_real_'+str(N)+'x'+str(N)
+psf_real = DatasetPSF(N,type_psf_real)
+_ = psf_real.read(N,type_psf_real)
+
+dirtys_gauss = DatasetDirty(N,type_psf_gauss)
+_ =dirtys_gauss.read(size_image = N, type_psf = type_psf_gauss,start = 0, stop = 4)
+
+dirtys_real = DatasetDirty(N,type_psf_gauss)
+_ = dirtys_real.read(size_image = N, type_psf = type_psf_real,start = 0, stop = 4)'''
+
+
+# %%
+#images.view(0)
+
+# %%
+#psf_gauss.view()
+
+# %%
+#psf_real.view()
+
+# %%
+#dirtys_real.view(0)
+
+# %%
+#images.view(1)
+
+# %%
+#psf_gauss.view()
+
+# %%
+#psf_real.view()
+
+# %%
+#dirtys_real.view(1)
+
+# %%
+
+
+# %%
+
 
 # %%
