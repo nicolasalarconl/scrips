@@ -1,6 +1,7 @@
 # %%
 from paramsEllipses import ParamsEllipses
-import cupy as cp
+#import cupy as cp
+import numpy as cp
 from matplotlib import pyplot as plt
 
 # %%
@@ -11,7 +12,7 @@ class Ellipse:
     
     def normalize(self,figure):
         figure = figure - cp.min(figure)
-        if (cp.max == 0):
+        if (cp.max(figure) == 0):
             figure = figure/0.000001
         else:
             figure = figure/cp.max(figure)
@@ -21,7 +22,6 @@ class Ellipse:
         X=cp.reshape(cp.arange(0,size),(1,size))
         X=cp.reshape(cp.arange(0,size),(1,size))
         Y=cp.reshape(cp.arange(0,size),(size,1))
-        X=X-size/2 + mov_x
         X=X-size/2 + mov_x
         Y=Y-size/2 + mov_y
         c=cp.cos(angle)
@@ -39,11 +39,14 @@ class Ellipse:
         return Z
     
     def view(self):
-        plt.imshow(cp.asnumpy(self.data))
+        #plt.imshow(cp.asnumpy(self.data))
+        plt.imshow(self.data)
 
 # %%
 #from paramsEllipses import ParamsEllipses 
-#params= ParamsEllipses(128)
-#size_figure,axis_minor,axis_major,min_value_intensity, max_value_intensity,mov_x,moy_y,angle,sigma= params.get_params_random(1)
+#params= ParamsEllipses(500)
+#size_figure,axis_minor,axis_major,min_value_intensity, max_value_intensity,mov_x,moy_y,angle,sigma= params.get_params_random(8000)
 #elipse= Ellipse(size_figure,axis_minor,axis_major,min_value_intensity, max_value_intensity,mov_x,moy_y,angle,sigma )
 #elipse.view()
+
+# %%

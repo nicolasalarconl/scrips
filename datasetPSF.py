@@ -1,6 +1,7 @@
 # %%
-import cupy as cp 
-
+#import cupy as cp
+import numpy as cp
+import numpy as np
 from astropy.io import fits
 from astropy.utils.data import download_file
 from matplotlib import pyplot as plt
@@ -38,7 +39,7 @@ class DatasetPSF:
     def save(self,size_image,type_psf,psf,path = None):
         self.size_image = size_image
         self.type_psf =  type_psf
-        psf = cp.asnumpy(psf)
+        #psf = cp.asnumpy(psf)
         if(path != None):   
             self.path_save = path
         AuxiliaryFunctions.make_dir(self.path_save)
@@ -46,7 +47,7 @@ class DatasetPSF:
         hdu_image.writeto(self.path_save+'/psf_'+self.type_psf+'.fits',clobber=True)
         self.image = psf
 
-    def read(self,size_image,type_psf,path_ = None):
+    def read(self,size_image,type_psf,path = None):
         self.type_psf =  type_psf
         self.size_image = size_image
         if(path != None):
@@ -68,12 +69,12 @@ class DatasetPSF:
         return self.image
       
     def resize(self,psf,size):
-        image = cv2.resize(cp.asnumpy(psf), dsize=(size, size), interpolation=cv2.INTER_CUBIC)
+        #image = cv2.resize(cp.asnumpy(psf), dsize=(size, size), interpolation=cv2.INTER_CUBIC)
+        image = cv2.resize(psf, dsize=(size, size), interpolation=cv2.INTER_CUBIC)        
         self.image = cp.array(image)
         return self.image
        
     def view(self):
-            plt.imshow(cp.asnumpy(self.image))
+            #plt.imshow(cp.asnumpy(self.image))
+            plt.imshow(self.image)
     
-
-# %%

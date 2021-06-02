@@ -3,7 +3,8 @@ from datasetImages import DatasetImages
 from datasetPSF import DatasetPSF
 from datasetDirty import DatasetDirty
 from paramsEllipses import ParamsEllipses
-import cupy as cp
+#import cupy as cp
+import numpy as cp
 
 class Simulator:
     def psf_gauss(self,tamX,tamY):
@@ -21,13 +22,12 @@ class Simulator:
         
     
     def create_all(self,size,start,finish,step):
-    
         list_index = cp.arange(int(start),int(finish),int(step))
         for index in list_index:    
             params = ParamsEllipses(size,index)
             dataset = DatasetImages(size)
             dataset.save(size_image =params.size_figure, params = params,start = index,finish =index+step)
-
+            
             type_psf = 'psf_gauss_'+str(params.size_figure)+'x'+str(params.size_figure)
             psf_gauss = self.psf_gauss(params.size_figure,params.size_figure)
             psf = DatasetPSF(size,type_psf)
@@ -48,33 +48,14 @@ class Simulator:
             dirty_gauss.save(images,params.size_figure,type_psf,psf_gauss,start = index ,finish = index+step)
 
         
-
+           
         
         
 
 # %%
-#x = Simulator().create_all(28,0,10)
-
-# %%
-#images = DatasetImages(11)
-#images.read(size_image=11, start = 0,finish = 10)
+#x = Simulator().create_all(28,0,1000,10)
+#images = DatasetImages(500)
+#images.read(size_image=500, start = 0,finish = 10)
 #images.view()
-
-# %%
-#psf_gauss = DatasetPSF()
-#psf_gauss.read(11,'psf_gauss_11x11')
-#psf_gauss.view()
-
-# %%
-#psf_real = DatasetPSF()
-#psf_real.read(11,'psf_real_11x11')
-#psf_real.view()
-#psf_real.view()
-
-# %%
-#dirty = DatasetDirty(11,'psf_real_11x11')
-#dirty.read(11,'psf_real_11x11',start = 0, finish= 10)
-#dirty.view_dirty()
-
 
 # %%
