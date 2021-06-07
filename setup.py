@@ -1,4 +1,4 @@
-tfrom distutils.core import setup
+from distutils.core import setup
 setup(
   name = 'script-simulated-images-interferometry',
   packages = ['script-simulated-images-interferometry'], # this must be the same as the name above
