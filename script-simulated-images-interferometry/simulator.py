@@ -1,3 +1,4 @@
+#@title
 # %%
 from datasetImages import DatasetImages
 from datasetPSF import DatasetPSF
@@ -48,18 +49,5 @@ class Simulator:
             dirty_gauss.save(images,params.size_figure,type_psf,psf_gauss,start = index ,finish = index+step)
 
         
-#hola#
 
-# %%
-N = 120
-#x = Simulator().create_all(N,0,10,2)
 
-# %%
-images = DatasetImages(N)
-_ = images.create(size_image=N, start = 0,stop = 10)
-type_psf_gauss = 'psf_gauss_'+str(N)+'x'+str(N)
-psf_gauss = DatasetPSF(N,type_psf_gauss)
-_ =psf_gauss.read(N,type_psf_gauss)
-type_psf_real = 'psf_real_'+str(N)+'x'+str(N)
-psf_real = DatasetPSF(N,type_psf_real)
-_ = psf_real.read(N,type_psf_real)

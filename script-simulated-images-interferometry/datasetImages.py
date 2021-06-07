@@ -119,7 +119,7 @@ class DatasetImages:
         if (self.len_images() <= index):
             print("index out of bounds, index max: "+str(self.len_images()-1))
         else:
-            plt.imshow(cp.asnumpy(self.images[index]))
+            plt.imshow(cp.asnumpy(self.images[index].image))
             #plt.imshow(self.images[index])
 
 

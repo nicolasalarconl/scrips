@@ -70,8 +70,8 @@ class RandomImage:
         return self.image
 
     def view(self):
-        #plt.imshow(cp.asnumpy(self.image))
-        plt.imshow(self.image)
+        plt.imshow(cp.asnumpy(self.image))
+        #plt.imshow(self.image)
 
 
         
