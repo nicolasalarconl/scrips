@@ -23,7 +23,7 @@ class DatasetPSF:
         else:
             return size_image  
     def init_path_save(self,path_save):
-        if (path_save == None):
+        if (path_save is None):
             return '../datasets/images_'+str(self.size_image)+'x'+str(self.size_image)+'/convolutions/'+str(self.type_psf)+'/psf' 
         else:
             return path_save
@@ -47,6 +47,29 @@ class DatasetPSF:
         hdu_image.writeto(self.path_save+'/psf_'+self.type_psf+'.fits',clobber=True)
         self.image = psf
 
+
+    def psf_gauss(self,tamX,tamY):
+        x, y = cp.meshgrid(cp.linspace(-1,1,tamX), cp.linspace(-1,1,tamY))
+        d = cp.sqrt(x*x+y*y)
+        sigma, mu = 1/(tamX/2), 0.0
+        gauss = cp.exp(-( (d-mu)**2 / ( 2.0 * sigma**2 ) ) )
+        return gauss
+
+
+    def psf_real(self,size):
+        type_psf = 'psf_real_'+str(size)+'x'+str(size)
+        url = 'https://github.com/nicolasalarconl/InterferometryDeepLearning/blob/main/4_hd142_128x128_08.psf.fits?raw=true'
+        psf = DatasetPSF(size,type_psf).read_url(size,type_psf,url)
+        return DatasetPSF(size,type_psf).resize(psf,size)
+        
+
+
+    def create(self,N,type_psf):
+        if (type_psf == 'psf_gauss_'+str(N)+'x'+str(N)):
+          self.image = self.psf_gauss(N,N)
+        if (type_psf == 'psf_real_'+str(N)+'x'+str(N)):
+          self.image = self.psf_real(N)
+        
     def read(self,size_image,type_psf,path = None):
         self.type_psf =  type_psf
         self.size_image = size_image
@@ -59,6 +82,8 @@ class DatasetPSF:
         self.image =  cp.reshape(data,[size,size])
         self.image 
         return self.image
+
+
     def read_url(self,size_image,type_psf,url):
         self.type_psf =  type_psf
         self.size_image = size_image

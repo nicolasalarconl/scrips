@@ -105,7 +105,6 @@ class DatasetImages:
             image = cp.array(image)
             images.append(image)
         self.images = images
-        return self.images
 
     def get_images(self):
         if (len(self.images) == 0):
