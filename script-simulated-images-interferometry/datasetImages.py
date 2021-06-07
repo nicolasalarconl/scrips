@@ -53,9 +53,7 @@ class DatasetImages:
             self.path_save = path
         self.start = start
         self.stop = stop
-        AuxiliaryFunctions.make_dir(self.path_save)
-        size = size_image
-        
+        AuxiliaryFunctions.make_dir(self.path_save)        
         list_figure_random = ListEllipses(params,start)
         self.recursions = []
         self.times = []
@@ -67,7 +65,29 @@ class DatasetImages:
             #hdu_image = fits.PrimaryHDU(image.image)
             hdu_image.writeto(self.path_save+'/image_'+str(self.size_image)+'x'+str(self.size_image)+'_'+str(index)+'.fits',overwrite=True)
             stop_time = time.time()
-            self.times.append(stop_time-start_time)        
+            self.times.append(stop_time-start_time)       
+
+        
+    def create(self,size_image,params,stop,start = None):
+        self.size_image  = size_image
+        self.params = params
+        if (start is None):
+            start = 0
+        self.start = start
+        self.stop = stop
+        list_figure_random = ListEllipses(params,start)
+        self.recursions = []
+        self.times = []
+        images = []
+        for index in cp.arange(int(start),int(stop),1):
+            start_time = time.time()
+            image = RandomImage(list_figure_random,index)
+            images.append(image)
+            self.recursions.append(image.recursion)
+            stop_time = time.time()
+            self.times.append(stop_time-start_time)
+        self.images = images
+
         
     def read(self,size_image,stop,path = None,start = None,):
         self.size_image  = size_image

@@ -21,8 +21,8 @@ class Simulator:
         return DatasetPSF(size,type_psf).resize(psf,size)
         
     
-    def create_all(self,size,start,finish,step):
-        list_index = cp.arange(int(start),int(finish),int(step))
+    def create_all(self,size,start,stop,step):
+        list_index = cp.arange(int(start),int(stop),int(step))
         for index in list_index:    
             params = ParamsEllipses(size)
             dataset = DatasetImages(size)
@@ -48,62 +48,18 @@ class Simulator:
             dirty_gauss.save(images,params.size_figure,type_psf,psf_gauss,start = index ,finish = index+step)
 
         
-           
-        
-        
+#hola#
 
 # %%
-#N = 120
+N = 120
 #x = Simulator().create_all(N,0,10,2)
 
 # %%
-''''images = DatasetImages(N)
-_ = images.read(size_image=N, start = 0,stop = 4)
-
+images = DatasetImages(N)
+_ = images.create(size_image=N, start = 0,stop = 10)
 type_psf_gauss = 'psf_gauss_'+str(N)+'x'+str(N)
 psf_gauss = DatasetPSF(N,type_psf_gauss)
 _ =psf_gauss.read(N,type_psf_gauss)
-
-
 type_psf_real = 'psf_real_'+str(N)+'x'+str(N)
 psf_real = DatasetPSF(N,type_psf_real)
 _ = psf_real.read(N,type_psf_real)
-
-dirtys_gauss = DatasetDirty(N,type_psf_gauss)
-_ =dirtys_gauss.read(size_image = N, type_psf = type_psf_gauss,start = 0, stop = 4)
-
-dirtys_real = DatasetDirty(N,type_psf_gauss)
-_ = dirtys_real.read(size_image = N, type_psf = type_psf_real,start = 0, stop = 4)'''
-
-
-# %%
-#images.view(0)
-
-# %%
-#psf_gauss.view()
-
-# %%
-#psf_real.view()
-
-# %%
-#dirtys_real.view(0)
-
-# %%
-#images.view(1)
-
-# %%
-#psf_gauss.view()
-
-# %%
-#psf_real.view()
-
-# %%
-#dirtys_real.view(1)
-
-# %%
-
-
-# %%
-
-
-# %%
