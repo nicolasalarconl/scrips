@@ -1,7 +1,7 @@
-from distutils.core import setup
+tfrom distutils.core import setup
 setup(
-  name = 'mypackage',
-  packages = ['mypackage'], # this must be the same as the name above
+  name = 'script-simulated-images-interferometry',
+  packages = ['script-simulated-images-interferometry'], # this must be the same as the name above
   version = '0.1',
   description = 'deconvolution of interferometric images',
   author = 'Nicolas Alarcon',
