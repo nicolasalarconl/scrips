@@ -1,4 +1,4 @@
-#@title
+@title
 # %%
 from datasetImages import DatasetImages
 from datasetPSF import DatasetPSF
@@ -35,9 +35,9 @@ class Simulator:
             psf.save(size_image=params.size_figure,type_psf=type_psf,psf= psf_gauss)
             psf_gauss = psf.image
         
-            images = dataset.read(params.size_figure,start = index,stop =index+step)
+            dataset.read(params.size_figure,start = index,stop =index+step)
             dirty_gauss = DatasetDirty(size,type_psf)
-            dirty_gauss.save(images,params.size_figure,type_psf,psf_gauss,start = index ,finish = index+step)
+            dirty_gauss.save(dataset.images,params.size_figure,type_psf,psf_gauss,start = index ,finish = index+step)
         
             type_psf = 'psf_real_'+str(params.size_figure)+'x'+str(params.size_figure)
             psf_real = self.psf_real(params.size_figure)
@@ -45,8 +45,8 @@ class Simulator:
             psf.save(size_image=params.size_figure,type_psf=type_psf,psf= psf_real)
             psf_real = psf.image 
          
-            dirty_gauss = DatasetDirty(size,type_psf)
-            dirty_gauss.save(images,params.size_figure,type_psf,psf_gauss,start = index ,finish = index+step)
+            dirty_real = DatasetDirty(size,type_psf)
+            dirty_real.save(dataset.images,params.size_figure,type_psf,psf_gauss,start = index ,finish = index+step)
 
         
 
