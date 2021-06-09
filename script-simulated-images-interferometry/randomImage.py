@@ -8,12 +8,9 @@ from matplotlib import pyplot as plt
 class RandomImage:
     def __init__(self,list_figures,index_random):
         self.recursion = 0
-        self.list_figures = list_figures
-        self.index_random = cp.asnumpy(index_random).item(0)
-        #self.index_random = index_random
-        
+        self.index_random = cp.asnumpy(index_random).item(0)        
         self.percentage_info = list_figures.params.percentage_info
-        self.image = self.random_figure()
+        self.image = self.random_figure(list_figures)
         
     def normalize(self,figure):
         figure = figure - cp.min(figure)
@@ -50,12 +47,12 @@ class RandomImage:
         return False
     
 
-    def random_figure(self):
-        size_list_figure = self.list_figures.len_list()
+    def random_figure(self,list_figures):
+        size_list_figure = list_figures.len_list()
         random.seed(self.index_random)
         random_index = random.randrange(0,size_list_figure-1,1);
-        final_figure = self.list_figures.data[random_index].data    
-        for figure in self.list_figures.data:
+        final_figure = list_figures.data[random_index].data    
+        for figure in list_figures.data:
                 final_figure = self.random_operation(final_figure,figure.data)
         final_figure_copy  = cp.copy(final_figure)
         final_figure[final_figure_copy ==0]=0       
@@ -64,14 +61,15 @@ class RandomImage:
             return final_figure
         else:
             self.recursion = self.recursion+1
-            self.index_random  = self.index_random + 100
-            return self.random_figure()        
+            self.index_random  = self.index_random + 1
+            return self.random_figure(list_figures)   
+        
     def get(self):
         return self.image
 
     def view(self):
         plt.imshow(cp.asnumpy(self.image))
-        #plt.imshow(self.image)
+ 
 
 
         

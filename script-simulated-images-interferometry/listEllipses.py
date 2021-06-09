@@ -37,7 +37,7 @@ class ListEllipses:
                 return ellipse
             else:
                 self.recursion = self.recursion+1
-                return self.sample_params(index_random+1000000000)
+                return self.sample_params(index_random+1)
      
     def create_list_ellipses(self,index_random):
         ellipses = []
@@ -47,14 +47,7 @@ class ListEllipses:
             index_random = index_random+i
             ellipses.append(ellipse)
         return ellipses
-    
-    def view(self):
-        if(self.len_list() > 0):
-            index = random.randrange(0,self.len_list()-1,1)
-            ellipse_random = self.data[index]
-            ellipse_random.view()
-        else:
-            print("error")
+  
                  
     def view(self,index = None):
         if  (index == None):

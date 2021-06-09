@@ -5,14 +5,11 @@ from datasetImages import DatasetImages
 from datasetPSF import DatasetPSF
 from astropy.io import fits
 import cupy as cp
-#import  numpy as cp
 import numpy as np
 import time
 from cupyx.scipy import ndimage #as ndcupy
-#from scipy import ndimage
 
 
-# %%
 class DatasetDirty:
     def __init__(self,size_image,type_psf,path_save = None,path_read = None): 
         self.size_image = size_image
@@ -20,7 +17,7 @@ class DatasetDirty:
         self.psf = []
         self.path_save = self.init_path_save(path_save)
         self.path_read = self.init_path_read(path_read)
-        self.dirtys = cp.ndarray([])
+        self.dirtys = []
         self.times = []
 
     def init_path_save(self,path_save):
@@ -35,7 +32,7 @@ class DatasetDirty:
             return path_read
     def time_averange(self):
         a = np.array(self.times)
-        return cp.sum(a)/(self.finish_save-self.start_save)
+        return cp.sum(a)/(self.len_dirtys())
 
     def len_dirtys(self):
         return len(self.dirtys)
@@ -54,9 +51,7 @@ class DatasetDirty:
             image = cp.array(image)
             psf = cp.array(psf)
             conv = ndimage.convolve(image,psf,mode='constant', cval=0.0)
-            hdu_image =fits.PrimaryHDU(cp.asnumpy(conv))
-            #hdu_image =fits.PrimaryHDU(conv)
-            hdu_image.writeto(self.path_save+'/conv_'+str(self.size_image)+'x'+str(self.size_image)+'_'+str(index)+'.fits',clobber=True)
+            hdu_image =fits.PrimaryHDU(cp.asnumpy(conv))            hdu_image.writeto(self.path_save+'/conv_'+str(self.size_image)+'x'+str(self.size_image)+'_'+str(index)+'.fits',clobber=True)
             index = index + 1
             stop_time = time.time()
             self.times.append(stop_time-start_time)
@@ -66,19 +61,16 @@ class DatasetDirty:
         self.size_image = size_image
         self.type_psf = type_psf
         self.psf = psf 
-        self.dirtys = cp.zeros(len(images))
-        index = 0 
+        self.dirtys = []
+        convs = []
         self.times = []
         for image in images:
             start_time = time.time()
-            image = image.image
-            #image = cp.array(image)
-            #psf = cp.array(psf)
             conv = ndimage.convolve(image,psf,mode='constant', cval=0.0)
-            self.dirtys[index] = conv
-            index = index +1 
+            convs.append(conv)
             stop_time = time.time()
             self.times.append(stop_time-start_time)
+        self.dirtys = convs
       
     def read(self,size_image,type_psf,start,stop,path = None):
         self.size_image  = size_image
@@ -94,12 +86,6 @@ class DatasetDirty:
             image = cp.reshape(data,[self.size_image,self.size_image])
             image = cp.array(image)
             self.dirtys.append(image)
-
-    def get_dirtys(self):
-        if (len(self.dirtys) == 0):
-            return self.read_dataset()
-        else:
-            return self.dirtys
      
     def view(self,index = None):
         if  (index == None):
@@ -108,5 +94,4 @@ class DatasetDirty:
             print("index out of bounds, index max: "+str(self.len_dirtys()-1))
         else:
             plt.imshow(cp.asnumpy(self.dirtys[index]))
-            #plt.imshow(self.dirtys[index])
             

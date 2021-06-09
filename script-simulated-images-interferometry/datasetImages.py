@@ -18,9 +18,8 @@ class DatasetImages:
         self.path_read = self.init_path_read(path_read)
         self.params = []       
         self.images = []
-        self.start = 0
-        self.stop = 0
         self.recursions = []
+        self.times = []
 
     def init_path_save(self,path_save):
         if (path_save == None):
@@ -35,11 +34,11 @@ class DatasetImages:
 
     def recursion_average(self):
         a = np.array(self.recursions)
-        return cp.sum(a)/(self.start-self.stop)
+        return cp.sum(a)/(self.len_images())
 
     def time_averange(self):
         a = np.array(self.times)
-        return cp.sum(a)/(self.start-self.stop)
+        return cp.sum(a)/(self.len_images())
     
     def len_images(self):
         return len(self.images)
@@ -51,8 +50,7 @@ class DatasetImages:
             start = 0
         if(path is not None):   
             self.path_save = path
-        self.start = start
-        self.stop = stop
+        
         AuxiliaryFunctions.make_dir(self.path_save)        
         list_figure_random = ListEllipses(params,start)
         self.recursions = []
@@ -60,21 +58,16 @@ class DatasetImages:
         for index in cp.arange(int(start),int(stop),1):
             start_time = time.time()
             image = RandomImage(list_figure_random,index)
-            self.recursions.append(image.recursion)
-            hdu_image =fits.PrimaryHDU(cp.asnumpy(image.image))
-            #hdu_image = fits.PrimaryHDU(image.image)
-            hdu_image.writeto(self.path_save+'/image_'+str(self.size_image)+'x'+str(self.size_image)+'_'+str(index)+'.fits',overwrite=True)
+            hdu_image =fits.PrimaryHDU(cp.asnumpy(image.image))            hdu_image.writeto(self.path_save+'/image_'+str(self.size_image)+'x'+str(self.size_image)+'_'+str(index)+'.fits',overwrite=True)
             stop_time = time.time()
-            self.times.append(stop_time-start_time)       
-
+            self.times.append(stop_time-start_time) 
+            self.recursions.append(image.recursion)
         
     def create(self,size_image,params,stop,start = None):
         self.size_image  = size_image
         self.params = params
         if (start is None):
             start = 0
-        self.start = start
-        self.stop = stop
         list_figure_random = ListEllipses(params,start)
         self.recursions = []
         self.times = []
@@ -82,14 +75,14 @@ class DatasetImages:
         for index in cp.arange(int(start),int(stop),1):
             start_time = time.time()
             image = RandomImage(list_figure_random,index)
-            images.append(image)
-            self.recursions.append(image.recursion)
+            images.append(image.image)
             stop_time = time.time()
             self.times.append(stop_time-start_time)
+            self.recursions.append(image.recursion)
         self.images = images
 
         
-    def read(self,size_image,stop,path = None,start = None,):
+    def read(self,size_image,t,path = None,start = None,):
         self.size_image  = size_image
         if (start is None):
             start = 0
@@ -106,12 +99,7 @@ class DatasetImages:
             images.append(image)
         self.images = images
 
-    def get_images(self):
-        if (len(self.images) == 0):
-            return self.read_dataset()
-        else:
-            return self.images
-     
+
     def view(self,index = None):
         if  (index is None):
             index = 1
@@ -119,7 +107,6 @@ class DatasetImages:
             print("index out of bounds, index max: "+str(self.len_images()-1))
         else:
             plt.imshow(cp.asnumpy(self.images[index].image))
-            #plt.imshow(self.images[index])
 
 
 # %%

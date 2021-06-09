@@ -58,9 +58,7 @@ class ParamsEllipses:
         self.n_operation=  n_operation
         
         self.percentage_info = percentage_info
-     
-        self.list_params_random = self.create_list_params()
-    
+         
     def init_min_value_axis_minor(self,min_value_axis_minor):
         if(min_value_axis_minor == None):
             return self.size_figure*0.05
@@ -106,7 +104,7 @@ class ParamsEllipses:
         return axis_minor_list,axis_major_list,mov_x_list,mov_y_list,angle_list,sigma_list
     
     def get_params_random(self,index_random):
-        axis_minor_list,axis_major_list,mov_x_list,mov_y_list,angle_list,sigma_list = self.list_params_random
+        axis_minor_list,axis_major_list,mov_x_list,mov_y_list,angle_list,sigma_list = self.create_list_params()
         random.seed(cp.asnumpy(index_random).item(0))
         #random.seed(index_random)
         axis_minor  = random.choice(axis_minor_list)
