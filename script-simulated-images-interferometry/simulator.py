@@ -7,7 +7,7 @@ import cupy as cp
 
 class Simulator:
          
-    def create_save(self,size,start,stop,step):
+    def create_save(size,start,stop,step):
         list_index = cp.arange(int(start),int(stop),int(step))
         for index in list_index:    
             params = ParamsEllipses(size)
@@ -18,7 +18,8 @@ class Simulator:
             psf = DatasetPSF(size,type_psf)
             psf_gauss = psf.psf_gauss(params.size_figure,params.size_figure)
             psf.save(size_image=params.size_figure,type_psf=type_psf,psf= psf_gauss)
-            psf_gauss = psf.image
+            # TODO: arreglar
+            ##psf.read(size_image=params.size_figure,type_psf=type_psf)
         
             dataset.read(params.size_figure,start = index,stop =index+step)
             dirty_gauss = DatasetDirty(size,type_psf)

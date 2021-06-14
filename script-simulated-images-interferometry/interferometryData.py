@@ -1,4 +1,5 @@
 from torch.utils.data import Dataset
+import cupy as cp
 
 class InterferometryData(Dataset):
   def __init__(self,datasetnoised,datasetclean,transform):

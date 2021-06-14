@@ -1,7 +1,6 @@
 # %%
 #import cupy as cp
 import cupy as cp
-#import numpy as np
 from astropy.io import fits
 from astropy.utils.data import download_file
 from matplotlib import pyplot as plt
@@ -64,19 +63,20 @@ class DatasetPSF:
         if (type_psf == 'psf_real_'+str(N)+'x'+str(N)):
           self.image = self.psf_real(N)
         
+        
+    ## TODO: arreglar ## 
     def read(self,size_image,type_psf,path = None):
-        self.type_psf =  type_psf
+        '''self.type_psf =  type_psf
         self.size_image = size_image
         if(path != None):
             self.path_read = path
         hdul=fits.open(self.path_read+'/psf_'+self.type_psf+'.fits')
         hdr = hdul[0].header
         size = hdr[3]
-        data = hdul[0].data.astype(cp.float32)
-        self.image =  cp.reshape(data,[size,size])
-        self.image 
-        return self.image
-
+        data = hdul[0].data
+        data=  cp.reshape(data,[size,size])[0]
+        data  = cp.array(data)
+        print(type(data))'''
 
     def read_url(self,size_image,type_psf,url):
         self.type_psf =  type_psf
@@ -88,9 +88,7 @@ class DatasetPSF:
         return self.image
       
     def resize(self,psf,size):
-        image = cv2.resize(cp.asnumpy(psf), dsize=(size, size), interpolation=cv2.INTER_CUBIC)
-        self.image = cp.array(image)
-        return self.image
+        return  cv2.resize(cp.asnumpy(psf), dsize=(size, size), interpolation=cv2.INTER_CUBIC)
        
     def view(self):
             plt.imshow(cp.asnumpy(self.image))

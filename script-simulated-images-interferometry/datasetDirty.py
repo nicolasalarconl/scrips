@@ -48,10 +48,10 @@ class DatasetDirty:
         self.times = []
         for image in images:
             start_time = time.time()
-            image = cp.array(image)
-            psf = cp.array(psf)
             conv = ndimage.convolve(image,psf,mode='constant', cval=0.0)
-            hdu_image =fits.PrimaryHDU(cp.asnumpy(conv))            hdu_image.writeto(self.path_save+'/conv_'+str(self.size_image)+'x'+str(self.size_image)+'_'+str(index)+'.fits',clobber=True)
+            hdu_image =fits.PrimaryHDU(cp.asnumpy(conv))
+            hdu_image.writeto(self.path_save+'/conv_'+str(self.size_image)+'x'+str(self.size_image)+'_'+str(index)+'.fits',
+                              overwrite=True)
             index = index + 1
             stop_time = time.time()
             self.times.append(stop_time-start_time)

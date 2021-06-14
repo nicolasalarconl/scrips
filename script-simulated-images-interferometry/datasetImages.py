@@ -58,7 +58,9 @@ class DatasetImages:
         for index in cp.arange(int(start),int(stop),1):
             start_time = time.time()
             image = RandomImage(list_figure_random,index)
-            hdu_image =fits.PrimaryHDU(cp.asnumpy(image.image))            hdu_image.writeto(self.path_save+'/image_'+str(self.size_image)+'x'+str(self.size_image)+'_'+str(index)+'.fits',overwrite=True)
+            hdu_image =fits.PrimaryHDU(cp.asnumpy(image.image))     
+            hdu_image.writeto(self.path_save+'/image_'+str(self.size_image)+'x'+str(self.size_image)+'_'+str(index)+'.fits',
+                            overwrite=True)
             stop_time = time.time()
             self.times.append(stop_time-start_time) 
             self.recursions.append(image.recursion)
@@ -80,12 +82,9 @@ class DatasetImages:
             self.times.append(stop_time-start_time)
             self.recursions.append(image.recursion)
         self.images = images
-
-        
-    def read(self,size_image,t,path = None,start = None,):
+    
+    def read(self,size_image,start,stop,path = None):
         self.size_image  = size_image
-        if (start is None):
-            start = 0
         if(path != None):   
             self.path_read= path
         AuxiliaryFunctions.make_dir(self.path_read)
@@ -95,7 +94,7 @@ class DatasetImages:
             hdul=fits.open(path_file)
             data = hdul[0].data.astype(cp.float32)
             image = cp.reshape(data,[self.size_image,self.size_image])
-            image = cp.array(image)
+            image  = cp.array(image)
             images.append(image)
         self.images = images
 
