@@ -5,10 +5,18 @@ import cupy as cp
 
 # %%
 class ListEllipses:
-    def __init__(self,params,index_random):
+    def __init__(self,params,index_random,device):
+        self.device = self.init_device(device)
         self.params = params
-        self.data =self.create_list_ellipses(index_random)
         self.recursion = 0
+        self.data =self.create_list_ellipses(index_random)
+
+  
+    def init_device(self,device):
+        cp.cuda.Device(device).use()
+        return device
+    
+    
     def len_list_params(self):
         return self.params.size_sample
     
@@ -28,7 +36,7 @@ class ListEllipses:
 
     def create_ellipse(self,parameter):
         size_figure,axis_minor,axis_major,min_value_intensity, max_value_intensity,mov_x,moy_y,angle,sigma = parameter
-        return Ellipse(size_figure,axis_minor,axis_major,min_value_intensity, max_value_intensity,mov_x,moy_y,angle,sigma)
+        return Ellipse(size_figure,axis_minor,axis_major,min_value_intensity, max_value_intensity,mov_x,moy_y,angle,sigma,self.device)
         
     def sample_params(self,index_random):
             params = self.params.get_params_random(index_random)

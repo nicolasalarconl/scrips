@@ -6,9 +6,13 @@ from matplotlib import pyplot as plt
 
 # %%
 class Ellipse:   
-    def __init__(self, size,axis_minor, axis_major,min_intensity,max_intensity,mov_x,mov_y,angle,sigma):
+    def __init__(self, size,axis_minor, axis_major,min_intensity,max_intensity,mov_x,mov_y,angle,sigma,device):
+        self.init_device(device)
         self.data = self.__get__(size,axis_minor,axis_major,min_intensity,max_intensity,mov_x,mov_y,angle,sigma);
-    
+   
+    def init_device(self,device):
+        cp.cuda.Device(device).use()
+  
     
     def normalize(self,figure):
         figure = figure - cp.min(figure)

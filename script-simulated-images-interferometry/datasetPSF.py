@@ -9,23 +9,28 @@ from auxiliaryFunctions import AuxiliaryFunctions
 
 # %%
 class DatasetPSF:
-    def __init__(self,size_image,type_psf,path_save = None,path_read = None):
+    def __init__(self,size_image,type_psf,device,path_save = None,path_read = None):
         self.size_image = size_image
         self.type_psf = type_psf
         self.image = []
         self.path_save = self.init_path_save(path_save)
         self.path_read = self.init_path_read(path_read)
+        self.device = self.init_device(device)
+  
+    def init_device(self,device):
+        cp.cuda.Device(device).use()
+        return device
     
     
     def init_path_save(self,path_save):
         if (path_save is None):
-            return '../datasets/images_'+str(self.size_image)+'x'+str(self.size_image)+'/convolutions/'+str(self.type_psf)+'/psf' 
+            return '../../datasets/images_'+str(self.size_image)+'x'+str(self.size_image)+'/convolutions/'+str(self.type_psf)+'/psf' 
         else:
             return path_save
         
     def init_path_read(self,path_read):
         if (path_read == None):
-            return '../datasets/images_'+str(self.size_image)+'x'+str(self.size_image)+'/convolutions/'+str(self.type_psf)+'/psf' 
+            return '../../datasets/images_'+str(self.size_image)+'x'+str(self.size_image)+'/convolutions/'+str(self.type_psf)+'/psf' 
         else:
             return path_read 
         
@@ -54,8 +59,8 @@ class DatasetPSF:
     def psf_real(self,size):
         type_psf = 'psf_real_'+str(size)+'x'+str(size)
         url = 'https://github.com/nicolasalarconl/InterferometryDeepLearning/blob/main/4_hd142_128x128_08.psf.fits?raw=true'
-        psf = DatasetPSF(size,type_psf).read_url(size,type_psf,url)
-        return DatasetPSF(size,type_psf).resize(psf,size)
+        psf = DatasetPSF(size,type_psf,self.device).read_url(size,type_psf,url)
+        return DatasetPSF(size,type_psf,self.device).resize(psf,size)
         
     def create(self,N,type_psf):
         if (type_psf == 'psf_gauss_'+str(N)+'x'+str(N)):

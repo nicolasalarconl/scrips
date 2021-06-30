@@ -5,6 +5,7 @@ import random
 class ParamsEllipses:
     def __init__(self
                 ,size_figure
+                ,device 
                 ,min_value_intensity = 0.01
                 ,max_value_intensity = 0.99
                 ,step_axis_minor= 0.01
@@ -58,6 +59,10 @@ class ParamsEllipses:
         self.n_operation=  n_operation
         
         self.percentage_info = percentage_info
+        self.device = self.init_device(device)
+  
+    def init_device(self,device):
+        cp.cuda.Device(device).use()
          
     def init_min_value_axis_minor(self,min_value_axis_minor):
         if(min_value_axis_minor == None):

@@ -11,7 +11,7 @@ from cupyx.scipy import ndimage #as ndcupy
 
 
 class DatasetDirty:
-    def __init__(self,size_image,type_psf,path_save = None,path_read = None): 
+    def __init__(self,size_image,type_psf,device,path_save = None,path_read = None): 
         self.size_image = size_image
         self.type_psf = type_psf
         self.psf = []
@@ -19,15 +19,19 @@ class DatasetDirty:
         self.path_read = self.init_path_read(path_read)
         self.dirtys = []
         self.times = []
+        self.init_device(device)
+  
+    def init_device(self,device):
+         cp.cuda.Device(device).use()
 
     def init_path_save(self,path_save):
         if (path_save is None):
-            return '../datasets/images_'+str(self.size_image)+'x'+str(self.size_image)+'/convolutions/'+self.type_psf+'/conv/'
+            return '../../datasets/images_'+str(self.size_image)+'x'+str(self.size_image)+'/convolutions/'+self.type_psf+'/conv'
         else:
             return path_save
     def init_path_read(self,path_read):
         if (path_read == None):
-            return'../datasets/images_'+str(self.size_image)+'x'+str(self.size_image)+'/convolutions/'+self.type_psf+'/conv/'
+            return'../../datasets/images_'+str(self.size_image)+'x'+str(self.size_image)+'/convolutions/'+self.type_psf+'/conv'
         else:
             return path_read
     def time_averange(self):
@@ -55,7 +59,8 @@ class DatasetDirty:
             index = index + 1
             stop_time = time.time()
             self.times.append(stop_time-start_time)
-    
+            
+           
 
     def create(self,images,size_image,type_psf,psf):
         self.size_image = size_image
@@ -71,6 +76,7 @@ class DatasetDirty:
             stop_time = time.time()
             self.times.append(stop_time-start_time)
         self.dirtys = convs
+       
       
     def read(self,size_image,type_psf,start,stop,path = None):
         self.size_image  = size_image
@@ -95,3 +101,8 @@ class DatasetDirty:
         else:
             plt.imshow(cp.asnumpy(self.dirtys[index]))
             
+         
+              
+  
+           
+
