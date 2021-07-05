@@ -135,8 +135,10 @@ class DatasetInterferometry:
     
     
     def read_train_data(self,start,stop):
+        
         size =stop-start  #size of lot of the dataset
         size_train = math.trunc(size*self.perc_train)
+        
         data_image = DatasetImages(self.size_figure,self.device)
         data_image.read(size_image=self.size_figure, start = start,stop = start+size_train)
         data_dirty = DatasetDirty(self.size_figure,self.type_psf,self.device)
@@ -179,9 +181,9 @@ class DatasetInterferometry:
     def view_data(self,data):
         i = 1
         size = len(data)
-        fig = plt.figure(figsize=(30,30))
+        fig = plt.figure(figsize=(5,5))
         for d in data:
-            dirty,clean = d               
+            dirty,clean,mask = d               
             ax = fig.add_subplot(size,2, i, xticks=[], yticks=[])
             plt.imshow(dirty.squeeze().numpy())
             i = i+1

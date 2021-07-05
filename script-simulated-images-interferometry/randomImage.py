@@ -21,12 +21,14 @@ class RandomImage:
        
         
     def normalize(self,figure):
-        figure = figure - cp.min(figure)
+        figure[figure[0][0] == figure] =0
+        mask = figure == 0
+        figure[1-mask] -= cp.min(figure[1-mask]) 
         if (cp.max(figure) == 0):
-            figure = figure/0.000001
-        else:
-            figure = figure/cp.max(figure)
-        return figure
+            figure = -1*figure
+        f = figure/cp.max(figure)
+        #print(f)
+        return  f
     
     def random_operation(self,figure_a,figure_b):
         random.seed(self.index_random)
@@ -74,7 +76,9 @@ class RandomImage:
         final_figure[final_figure_copy ==0]=0       
         if (self.isNull(final_figure) == False):
             mask = self.get_mask(final_figure)
+            print(final_figure)
             final_figure = self.normalize(final_figure)
+            print(final_figure)
             return final_figure, mask
         else:
             self.recursion = self.recursion+1

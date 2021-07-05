@@ -1,5 +1,3 @@
-
-
 from tqdm import tqdm
 import torch 
 from datasetInterferometry import DatasetInterferometry
@@ -7,10 +5,15 @@ from auxiliaryFunctions import AuxiliaryFunctions
 from graph import Graph
 from psnr import PSNR
 import time
+import torch.nn as nn
+import torch.optim as optim
+
+
 
 
 class Model:
-    def __init__(self,size_figure,type_psf,num_epochs,learning_rate,batch_train,criterion,optimizer,device,start,stop, step = None,path_validation= None,path_test=None,path_graph = None,path_model = None,path_log= None):
+    def __init__(self,size_figure,type_psf,num_epochs,learning_rate,batch_train,net,device,start,stop, step = None,path_validation= None,path_test=None,path_graph = None,path_model = None,path_log= None,architecture_name=None):
+        self.architecture_name = architecture_name
         self.size_figure = size_figure
         self.type_psf = type_psf
         self.num_epochs = num_epochs
@@ -19,38 +22,38 @@ class Model:
         self.start = start
         self.stop = stop
         self.step = step
-        self.criterion = criterion
-        self.optimizer = optimizer
+        self.criterion = nn.MSELoss() 
+        self.optimizer = optim.Adam(net.parameters(), lr=self.learning_rate) 
         self.size_data = start-stop
         self.path_test  =  self.init_path_test(path_test)
         self.path_graph =  self.init_path_graph(path_graph)
         self.path_model = self.init_path_model(path_model)
         self.path_log =  self.init_path_log(path_log)
-        self.model_data = self.type_psf+'_S'+str(self.size_data)+'_B'+str(self.batch_train)+'_E'+str(self.num_epochs)
+        self.model_data = str(architecture_name)+'_'+str(self.size_figure )+'x'+str(self.size_figure)+'_'+self.type_psf+'_L'+str(self.learning_rate)+'_S'+str(self.size_data)+'_B'+str(self.batch_train)+'_E'+str(self.num_epochs)
         self.device = device
          
     def init_path_test(self,path_test):
         if (path_test == None):
-            return '../../datasets/images_'+str(self.size_figure )+'x'+str(self.size_figure )+'/convolutions/'+self.type_psf+'/models/model_S'+str(self.size_data)+'_B'+str(self.batch_train)+'_E'+str(self.num_epochs)+'/test'
+            return '../../datasets/images_'+str(self.size_figure )+'x'+str(self.size_figure )+'/convolutions/'+self.type_psf+'/models/'+str(self.architecture_name)+'/model_L'+str(self.learning_rate)+'_S'+str(self.size_data)+'_B'+str(self.batch_train)+'_E'+str(self.num_epochs)+'/test'
         else:
             return path_test 
         
     def init_path_graph(self,path_graph):
         if (path_graph == None):
-            return '../../datasets/images_'+str(self.size_figure )+'x'+str(self.size_figure )+'/convolutions/'+self.type_psf+'/models/model_S'+str(self.size_data)+'_B'+str(self.batch_train)+'_E'+str(self.num_epochs)+'/graph'
+            return'../../datasets/images_'+str(self.size_figure )+'x'+str(self.size_figure )+'/convolutions/'+self.type_psf+'/models/'+str(self.architecture_name)+'/model_L'+str(self.learning_rate)+'_S'+str(self.size_data)+'_B'+str(self.batch_train)+'_E'+str(self.num_epochs)+'/graph'
         else:
             return path_graph 
         
     def init_path_model(self,path_model):
          if (path_model == None):
-            return '../../datasets/images_'+str(self.size_figure )+'x'+str(self.size_figure )+'/convolutions/'+self.type_psf+'/models/model_S'+str(self.size_data)+'_B'+str(self.batch_train)+'_E'+str( self.num_epochs)+'/model' 
+            return '../../datasets/images_'+str(self.size_figure )+'x'+str(self.size_figure )+'/convolutions/'+self.type_psf+'/models/'+str(self.architecture_name)+'/model_L'+str(self.learning_rate)+'_S'+str(self.size_data)+'_B'+str(self.batch_train)+'_E'+str(self.num_epochs)+'/model' 
          else:
             return path_model 
 
         
     def init_path_log(self,path_test):
         if (path_test == None):
-            return '../../datasets/images_'+str(self.size_figure )+'x'+str(self.size_figure )+'/log'
+            return '../../log/'+str(self.size_figure )+'x'+str(self.size_figure)
         else:
             return path_test 
     
@@ -113,11 +116,10 @@ class Model:
             for dirty,clean in tqdm((testloader)):
                 dirty,clean=dirty.to(device).float(),clean.float()
                 outputs = net(dirty)
-                dirty  = dirty.cpu().data
-                outputs = outputs.cpu().data
                 value_psnr = PSNR(clean,dirty,self.device).get
                 pnsr.append(value_psnr)
-
+                dirty  = dirty.cpu().data
+                outputs = outputs.cpu().data
                 AuxiliaryFunctions.save_fit_image(dirty, self.size_figure,name=self.path_test+'/noisy{}.png'.format(i))
                 AuxiliaryFunctions.save_fit_image(outputs, self.size_figure,
                                                       name=self.path_test+'/denoised{}.png'.format(i))
@@ -137,7 +139,9 @@ class Model:
                                      batch_train = self.batch_train,
                                      device = self.device)
         trainLoader = data.read_train_data(start,stop)
+     
         validationloader = data.read_validation_data(start,stop)
+     
         for epoch in range(self.num_epochs):
             running_loss = 0.0
             net.train()
@@ -190,8 +194,12 @@ class Model:
             dirty=dirty.to(device).float()
             output = net(dirty).cpu().data
             dirty = dirty.cpu()
+            
+            start_time = time.time()
             psnr_c_o = PSNR(clean,output,mask,self.device).get
             psnr_c_d = PSNR(clean,dirty,mask,self.device).get
+            stop_time = time.time()
+            time_final = stop_time-start_time
             pnsr_d  = psnr_c_o - psnr_c_d
             pnsr_clean_output.append(psnr_c_o)
             pnsr_clean_dirty.append(psnr_c_d)
@@ -214,7 +222,6 @@ class Model:
         net.to(device)
         net,train_loss,validation_loss = self.train_data_memory(net,device,start,stop,step)
         AuxiliaryFunctions.save_mfodel(net,self.path_model)
-  
         Graph.train_loss_validation_loss_epoch(path_graph =self.path_graph ,train_loss = train_loss,
                                                validation_loss = validation_loss)        
         net,pnsr= self.test_data_memory(net,device,start,stop,step)
@@ -238,8 +245,10 @@ class Model:
                                                validation_loss = validation_loss)
         stop_time = time.time()
         AuxiliaryFunctions.log(self.path_log,self.model_data,'stop train data')
+        
         time_final = stop_time-start_time
         AuxiliaryFunctions.log(self.path_log,self.model_data,'total time train data',time_final)
+        net.to('cpu')
         return net
     
     def run_test_data(self,net,start,stop,size_save):
@@ -252,7 +261,8 @@ class Model:
         net.to(device) 
         net,pnsr_clean_output,pnsr_clean_dirty,pnsr_diff = self.test_data(net,device,start,stop,size_save)
         Graph.psnr_test(self.path_graph,pnsr_clean_output,pnsr_clean_dirty,pnsr_diff)
-        AuxiliaryFunctions.send_alert(self.path_log,pnsr_diff,self.model_data)
+        AuxiliaryFunctions.send_alert(self.path_log,pnsr_diff,pnsr_clean_dirty,pnsr_clean_output,self.model_data)
+        AuxiliaryFunctions.write_statistic(self.path_model,pnsr_diff,pnsr_clean_dirty,pnsr_clean_output)
         stop_time = time.time()
         AuxiliaryFunctions.log(self.path_log,self.model_data,'stop test data')
         time_final = stop_time-start_time
@@ -278,6 +288,7 @@ class Model:
         print("\n")
         print("Net: ",net)
         print("\n")
+        print(AuxiliaryFunctions.read_statistic(self.path_model))
         Graph.read_graph(self.path_graph+'/graph_loss_train_validation.png')
         Graph.read_graph(self.path_graph+'/graph_psnr_clean_output.png')
         Graph.read_graph(self.path_graph+'/graph_psnr_clean_dirty.png')

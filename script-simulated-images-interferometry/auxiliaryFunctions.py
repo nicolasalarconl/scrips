@@ -8,12 +8,23 @@ from astropy.io import fits
 import cupy as cp
 import pandas as pd
 
+import nvidia_smi
+
+
+
 
 
 # %%
 class AuxiliaryFunctions:
     
     
+    def size_gpu(device):
+        nvidia_smi.nvmlInit()
+        handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
+        info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
+        t,f,u = info.total,info.free, info.used
+        nvidia_smi.nvmlShutdown()
+        return t,f,u
     
     def make_dir(path):
         if not os.path.exists(path):
@@ -34,7 +45,6 @@ class AuxiliaryFunctions:
     def get_device(id):
         if torch.cuda.is_available():
             device = 'cuda:'+str(id)
-            print('device: '+device)
         else:
             device = 'cpu'
         return device
@@ -70,17 +80,40 @@ class AuxiliaryFunctions:
         file1.writelines(data)
         file1.close() 
         
-    def send_alert(path_log,psnr,data_model):
+    def write_statistic(path,psnr_diff,psnr_dirty,psnr_output):
+        path = path+'/statistic.txt'
+        file = open(path,"w+")
+        avg_psnr_diff = cp.asnumpy(cp.average(psnr_diff))
+        avg_psnr = cp.asnumpy(cp.average(psnr_output))
+        avg_psnr_dirty = cp.asnumpy(cp.average(psnr_dirty))
+        std_psnr_diff = cp.asnumpy(cp.std(cp.array(psnr_diff)))
+        std_psnr = cp.asnumpy(cp.std(cp.array(psnr_output)))
+        std_psnr_dirty = cp.asnumpy(cp.std(cp.array(psnr_dirty)))
+        file.writelines(['avg_diff: ' ,str(avg_psnr_diff),', std_diff: ' ,str(std_psnr_diff),', avg: ' ,str(avg_psnr),', std: ' ,str(std_psnr),', avg_dirty: ' ,str(avg_psnr_dirty),', std_dirty: ' ,str(std_psnr_dirty),'\n'])
+    def read_statistic(path):
+        path = path+'/statistic.txt'
+        f = open(path, "r")
+        r = f.read()
+        f.close()
+        return r
+
+    def send_alert(path_log,psnr_diff,psnr_dirty,psnr_output,data_model):
         path_avg = path_log+'/avg.csv'
         path_alert = path_log+'/alert.txt'
-        avg_psnr = cp.asnumpy(cp.average(psnr))
-        
+        avg_psnr_diff = cp.asnumpy(cp.average(psnr_diff))
+        avg_psnr = cp.asnumpy(cp.average(psnr_output))
+        avg_psnr_dirty = cp.asnumpy(cp.average(psnr_dirty))
+        std_psnr_diff = cp.asnumpy(cp.std(cp.array(psnr_diff)))
+        std_psnr = cp.asnumpy(cp.std(cp.array(psnr_output)))
+        std_psnr_dirty = cp.asnumpy(cp.std(cp.array(psnr_dirty)))
 
         if not os.path.isfile(path_avg):
             df = pd.DataFrame([avg_psnr])
             df.to_csv(path_avg,index=False)
             file = open(path_alert,"w+")
-            file.writelines(['model: '+data_model,' avg:' ,str(avg_psnr),'\n'])
+            file.writelines(['model: '+data_model,', avg diff: ' ,str(avg_psnr_diff),', std diff: ' ,str(std_psnr_diff),
+                                 ', avg: ' ,str(avg_psnr),', std: ' ,str(std_psnr),', avg_dirty: ' ,str(avg_psnr_dirty),
+                                 ', std_dirty: ' ,str(std_psnr_dirty),'\n'])
             file.close()
         else:
             avg = pd.read_csv(path_avg).to_numpy()
@@ -89,7 +122,9 @@ class AuxiliaryFunctions:
                 df = pd.DataFrame([avg_psnr])
                 df.to_csv(path_avg,index=False)
                 file = open(path_alert,"a")
-                file.writelines(['model: '+data_model,' avg:' ,str(avg_psnr),'\n'])
+                file.writelines(['model: '+data_model,', avg diff: ' ,str(avg_psnr_diff),', std diff: ' ,str(std_psnr_diff),
+                                 ', avg: ' ,str(avg_psnr),', std: ' ,str(std_psnr),', avg_dirty: ' ,str(avg_psnr_dirty),
+                                 ', std_dirty: ' ,str(std_psnr_dirty),'\n'])
                 file.close()
                     
              
